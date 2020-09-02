@@ -1,0 +1,261 @@
+// SalesTax.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+
+#include <iostream>
+using namespace std;
+#include <math.h>
+#include <map>
+#include<vector>
+#include <string>
+
+
+enum ProductType
+{
+   Food,
+   Medical,
+   Book,
+   Other
+};
+
+class Program
+{
+public:
+   void ProcessInput(string input)
+   {
+      for (int i = 0; i < input.length; i++)
+      {
+         cout << (input[i]) << endl;
+      }      
+
+      ShoppingCart ShoppingCart; // To be parsed
+
+      TaxCalculator taxCalculator = new TaxCalculator();
+      taxCalculator.Calculate(ShoppingCart);
+
+      //Discounting can be applied here!
+
+      ShopingCartPrinter.Print(ShoppingCart);
+   }
+};
+
+int main()
+{
+   string input[4] = { "1 book at 12.49",
+         "1 music CD at 14.99",
+         "1 chocolate bar at 0.85" };  
+
+   string input1[4] = 
+   {
+      "1 imported box of chocolates at 10.00",
+      "1 imported bottle of perfume at 47.50"
+   };
+
+   string input2[4] =
+   {
+         "1 imported bottle of perfume at 27.99",
+         "1 bottle of perfume at 18.99",
+         "1 packet of headache pills at 9.75",
+         "1 box of imported chocolates at 11.25"
+   };
+
+   Program obj;
+   obj.ProcessInput(input[4]);
+   obj.ProcessInput(input1[4]);
+   obj.ProcessInput(input2[4]);
+}
+
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started: 
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+
+
+
+class Product
+{
+   //create a map that stores strings indexed by strings
+private:
+   std::map<ProductType, std::string[]> itemType_Identifiers;
+
+   itemType_Identifiers[Food] = { "icecream", "choclates" };
+   itemType_Identifiers[Medical] = {"aspirin"};
+   itemType_Identifiers[Book] = { "MyBook" };
+
+public:
+   float ShelfPrice;
+
+   string Name;
+
+   bool IsImported()
+   { 
+      std::size_t found;
+
+      found = Name.find("imported", found + 1, 6);
+      if (found != std::string::npos)
+         return true;     
+   }
+
+   bool IsTypeOf(ProductType productType)
+   {
+
+      //Check the type of product here
+   }
+
+   virtual string ToString()
+   {
+      string retVal;
+      retVal = std::format("{} {}", Name, ShelfPrice);
+      return retVal;
+   }
+
+};
+
+
+class SalesTax
+{
+public:
+   bool IsApplicable(Product item) {
+   }
+   float Rate;
+
+   float Calculate(Product item)
+   {
+      if (IsApplicable(item))
+      {
+         //sales tax are that for a tax rate of n%, a shelf price of p contains (np/100)
+         float tax = (item.ShelfPrice * Rate) / 100;
+
+         //The rounding rules: rounded up to the nearest 0.05
+         tax = ceil(tax / 0.05) * 0.05;
+
+         return tax;
+      }
+
+      return 0;
+   }
+};
+
+class BasicSalesTax : SalesTax
+{
+private:
+   ProductType _taxExcemptions[] = { Food, Medical, Book };
+
+public:
+   virtual bool IsApplicable(Product item)
+   {
+      //Check if tax exemption is applicable here
+   }
+
+   virtual float getRate()
+   { 
+      return 10.00; 
+   }
+};
+
+class ImportedDutySalesTax : SalesTax
+{
+public:
+   virtual bool IsApplicable(Product item)
+   {
+      return item.IsImported;
+   }
+
+   virtual float getRate()
+   { 
+      return 5.00; 
+   } 
+
+};
+
+class TaxCalculator
+{
+private :
+   SalesTax *Taxes = new BasicSalesTax();
+
+public:
+   void Calculate(ShoppingCart ShoppingCart)
+   {
+      //Calculate the tax applicable for the produce here.
+   }
+};
+
+class ShoppingCart
+{
+public:
+   std::vector<ShoppingCartItem> CartItems;
+
+   float getTotalTax()
+   {  
+     // Calculate Total tax here 
+   } 
+   float getTotalCost()
+   { 
+      //Calculate total cost here
+   } 
+};
+
+class ShoppingCartItem
+{
+public :
+   Product Product;
+
+   int Quantity;
+
+   float Tax;
+
+   float getCost()
+   { 
+      return Quantity * (Tax + Product.ShelfPrice); 
+   }
+   
+   virtual string ToString()
+   {
+      string retVal;
+      retVal = std::format("{} {}", Quantity, Product.Name,Cost);
+   }
+};
+
+class ItemParser
+{
+private:
+   string ITEM_ENTRY_REGEX = "(\\d+) ([\\w\\s]* )at (\\d+.\\d{2})";
+
+   string food_identifier[2] = { "chocolate", "chocolates" };
+   string medical_identifier[1] = { "aspirin" };
+   string book_identifier[1] = { "MyBook" };
+
+public:
+   ShoppingCart Parse(string listOfItemfullDesc[])
+   {
+      //Parse the string array here   
+   }
+
+   ShoppingCartItem Parse(string itemfullDesc)
+   {
+     //Parse logic goes here
+      }
+
+      return NULL;
+   }
+};
+
+class ShopingCartPrinter
+{
+public:
+   void Print(ShoppingCart ShoppingCart)
+   {
+      //print items here
+      
+      //print Sales => Taxes: 1.50
+      cout << "Taxes " << ShoppingCart.TotalTax;
+
+      //print => Total: 29.83
+      cout << "Total " << ShoppingCart.TotalCost;
+   }
+};
