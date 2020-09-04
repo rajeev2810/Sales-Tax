@@ -9,6 +9,7 @@ using namespace std;
 #include <string>
 
 
+
 enum ProductType
 {
    Food,
@@ -29,12 +30,13 @@ public:
 
       ShoppingCart ShoppingCart; // To be parsed
 
-      TaxCalculator taxCalculator = new TaxCalculator();
-      taxCalculator.Calculate(ShoppingCart);
+      TaxCalculator *taxCalculator = new TaxCalculator();
+      taxCalculator->Calculate(ShoppingCart);
 
       //Discounting can be applied here!
 
-      ShopingCartPrinter.Print(ShoppingCart);
+      ShopingCartPrinter Printer;
+      Printer.Print(ShoppingCart);
    }
 };
 
@@ -81,16 +83,20 @@ class Product
 {
    //create a map that stores strings indexed by strings
 private:
-   std::map<ProductType, std::string[]> itemType_Identifiers;
-
-   itemType_Identifiers[Food] = { "icecream", "choclates" };
-   itemType_Identifiers[Medical] = {"aspirin"};
-   itemType_Identifiers[Book] = { "MyBook" };
+   map<ProductType, string[]> itemType_Identifiers;
+  
 
 public:
    float ShelfPrice;
 
    string Name;
+
+   void storeproduct()
+   {
+      itemType_Identifiers.insert(std::pair<ProductType, string*>(Food, new string( "icecream", "choclates" )));
+      itemType_Identifiers.insert(std::pair<ProductType, string*>(Medical, new string( "aspirin" )));
+      itemType_Identifiers.insert(std::pair<ProductType, string*>(Book, new string("Book1" )));
+   }
 
    bool IsImported()
    { 
@@ -103,25 +109,24 @@ public:
 
    bool IsTypeOf(ProductType productType)
    {
-
       //Check the type of product here
    }
 
    virtual string ToString()
    {
       string retVal;
-      retVal = std::format("{} {}", Name, ShelfPrice);
+      char buff[255];
+      snprintf(buff, sizeof(buff), "%s,%s", Name, ShelfPrice);
+      retVal = buff;      
       return retVal;
    }
-
 };
 
 
 class SalesTax
 {
 public:
-   bool IsApplicable(Product item) {
-   }
+   virtual bool IsApplicable(Product item) = 0;
    float Rate;
 
    float Calculate(Product item)
@@ -141,10 +146,10 @@ public:
    }
 };
 
-class BasicSalesTax : SalesTax
+class BasicSalesTax : public SalesTax
 {
 private:
-   ProductType _taxExcemptions[] = { Food, Medical, Book };
+   ProductType taxExemptions[] = { Food, Medical, Book };
 
 public:
    virtual bool IsApplicable(Product item)
@@ -158,7 +163,7 @@ public:
    }
 };
 
-class ImportedDutySalesTax : SalesTax
+class ImportedDutySalesTax : public SalesTax
 {
 public:
    virtual bool IsApplicable(Product item)
@@ -217,7 +222,10 @@ public :
    virtual string ToString()
    {
       string retVal;
-      retVal = std::format("{} {}", Quantity, Product.Name,Cost);
+      char buff[255];
+      snprintf(buff, sizeof(buff), "%s,%s,%s", Quantity, Product.Name, getCost());
+      retVal = buff;
+      return retVal;
    }
 };
 
@@ -236,13 +244,13 @@ public:
       //Parse the string array here   
    }
 
-   ShoppingCartItem Parse(string itemfullDesc)
+   ShoppingCartItem* Parse(string itemfullDesc)
    {
-     //Parse logic goes here
-      }
+      //Parse logic goes here
 
       return NULL;
    }
+   
 };
 
 class ShopingCartPrinter
@@ -253,9 +261,9 @@ public:
       //print items here
       
       //print Sales => Taxes: 1.50
-      cout << "Taxes " << ShoppingCart.TotalTax;
+      cout << "Taxes " << ShoppingCart.getTotalTax();
 
       //print => Total: 29.83
-      cout << "Total " << ShoppingCart.TotalCost;
+      cout << "Total " << ShoppingCart.getTotalCost();
    }
 };
