@@ -21,9 +21,9 @@ enum ProductType
 class Program
 {
 public:
-   void ProcessInput(string input)
+   void ProcessInput(string* input)
    {
-      for (int i = 0; i < input.length; i++)
+      for (int i = 0; i < input->length(); i++)
       {
          cout << (input[i]) << endl;
       }      
@@ -61,9 +61,9 @@ int main()
    };
 
    Program obj;
-   obj.ProcessInput(input[4]);
-   obj.ProcessInput(input1[4]);
-   obj.ProcessInput(input2[4]);
+   obj.ProcessInput(input);
+   obj.ProcessInput(input1);
+   obj.ProcessInput(input2);
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
@@ -81,7 +81,7 @@ int main()
 
 class Product
 {
-   //create a map that stores strings indexed by strings
+   //create a map that stores strings
 private:
    map<ProductType, string[]> itemType_Identifiers;
   
@@ -93,9 +93,9 @@ public:
 
    void storeproduct()
    {
-      itemType_Identifiers.insert(std::pair<ProductType, string*>(Food, new string( "icecream", "choclates" )));
-      itemType_Identifiers.insert(std::pair<ProductType, string*>(Medical, new string( "aspirin" )));
-      itemType_Identifiers.insert(std::pair<ProductType, string*>(Book, new string("Book1" )));
+      itemType_Identifiers.insert(std::pair<ProductType, string*>(Food, new string( "choclate", "choclates" )));
+      itemType_Identifiers.insert(std::pair<ProductType, string*>(Medical, new string( "pills" )));
+      itemType_Identifiers.insert(std::pair<ProductType, string*>(Book, new string("book" )));
    }
 
    bool IsImported()
@@ -127,14 +127,14 @@ class SalesTax
 {
 public:
    virtual bool IsApplicable(Product item) = 0;
-   float Rate;
+   virtual float getRate()=0;
 
    float Calculate(Product item)
    {
       if (IsApplicable(item))
       {
          //sales tax are that for a tax rate of n%, a shelf price of p contains (np/100)
-         float tax = (item.ShelfPrice * Rate) / 100;
+         float tax = (item.ShelfPrice * getRate()) / 100;
 
          //The rounding rules: rounded up to the nearest 0.05
          tax = ceil(tax / 0.05) * 0.05;
@@ -235,8 +235,8 @@ private:
    string ITEM_ENTRY_REGEX = "(\\d+) ([\\w\\s]* )at (\\d+.\\d{2})";
 
    string food_identifier[2] = { "chocolate", "chocolates" };
-   string medical_identifier[1] = { "aspirin" };
-   string book_identifier[1] = { "MyBook" };
+   string medical_identifier[1] = { "pills" };
+   string book_identifier[1] = { "book" };
 
 public:
    ShoppingCart Parse(string listOfItemfullDesc[])
